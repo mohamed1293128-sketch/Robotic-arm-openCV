@@ -1,0 +1,37 @@
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local configuration and secrets
+config.json
+secrets.h
+**/secrets.h
+.env
+.env.*
+
+# MediaPipe model files
+models/*.task
+*.task
+
+# IDE and editor settings
+.vscode/
+.idea/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test and coverage output
+.pytest_cache/
+.coverage
+htmlcov/
+

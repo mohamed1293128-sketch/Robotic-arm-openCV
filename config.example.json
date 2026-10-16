@@ -1,0 +1,7 @@
+{
+  "esp32_ip": "192.168.1.9",
+  "port": 5000,
+  "gesture_model": "models/gesture_recognizer.task",
+  "landmarker_model": "models/hand_landmarker.task",
+  "camera": 0
+}
