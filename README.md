@@ -177,4 +177,4 @@ Keep hands clear of moving joints during testing. Incorrect angle mappings, wiri
 
 ## License
 
-See the `LICENSE` file for the project's license terms.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
