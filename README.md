@@ -15,7 +15,7 @@ A robotic arm controlled by hand gestures and hand tracking using Python, OpenCV
 ## Hardware
 
 - ESP32 development board
-- ESP32-CAM or a compatible webcam setup
+- Webcam connected to the computer running the Python application
 - PCA9685 16-channel PWM servo driver
 - Five servos for the robotic arm
 - External power supply suitable for the servos
@@ -27,28 +27,29 @@ A robotic arm controlled by hand gestures and hand tracking using Python, OpenCV
 - Python 3
 - OpenCV
 - MediaPipe
-- An Arduino-compatible development environment
-- Adafruit PWM Servo Driver library for the ESP32 firmware
+- Arduino IDE or another compatible development environment
+- Adafruit PWM Servo Driver library
 
 ## Project Structure
 
 ```text
 Robotic-arm-openCV/
 ├── README.md
+├── LICENSE
 ├── requirements.txt
 ├── .gitignore
 ├── config.example.json
-├── config.json
 ├── models/
-│   └── .gitkeep
+│   ├── gesture_recognizer.task
+│   └── hand_landmarker.task
 ├── python/
-│   └── main.py
-└── esp32/
-    ├── robotic_arm.ino
-    └── secrets.h
+│   └── Robotic_arm.py
+└── esp32 frimware/
+    ├── robotic_arm_openCV_control.ino
+    └── secrets.h.example
 ```
 
-`config.json` and `esp32/secrets.h` contain local configuration and must not be committed if they contain private settings or credentials.
+The firmware directory is currently named `esp32 frimware`. The spelling is retained here to match the existing repository path.
 
 ## Installation
 
@@ -73,16 +74,7 @@ python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Add the MediaPipe models
-
-Place the following model files in the `models/` directory:
-
-- `gesture_recognizer.task`
-- `hand_landmarker.task`
-
-The model files are not included in this repository. Obtain them from the official MediaPipe documentation and follow their applicable licenses.
-
-### 5. Configure the application
+### 4. Configure the application
 
 Copy the example configuration:
 
@@ -90,38 +82,37 @@ Copy the example configuration:
 cp config.example.json config.json
 ```
 
-Edit `config.json` to match your ESP32 IP address, TCP port, model paths, and camera index.
+Edit `config.json` to set the ESP32 IP address and check the camera index. The example configuration expects both MediaPipe model files to be in `models/`.
 
-### 6. Configure the ESP32
+The local `config.json` is ignored by Git so machine-specific settings do not need to be committed.
 
-Open `esp32/robotic_arm.ino` in your Arduino-compatible development environment.
+### 5. Configure and upload the ESP32 firmware
 
-Create `esp32/secrets.h` locally and define your Wi-Fi credentials there. Ensure this file is ignored by Git.
+Open `esp32 frimware/robotic_arm_openCV_control.ino` in your Arduino-compatible development environment.
 
-Install the Adafruit PWM Servo Driver library and select the correct ESP32 board and port before uploading the firmware.
+Copy the example Wi-Fi header:
 
-Ensure the ESP32 and the computer running Python are connected to the same network.
+```bash
+cp "esp32 frimware/secrets.h.example" "esp32 frimware/secrets.h"
+```
+
+Edit `secrets.h` and replace the placeholder Wi-Fi network name and password. Do not commit the real `secrets.h` file.
+
+Install the Adafruit PWM Servo Driver library, select the correct ESP32 board and port, and upload the sketch. Ensure the ESP32 and the computer running Python are connected to the same local network.
 
 ## Running the Application
 
-From the repository root, run:
+Run the following command from the repository root:
 
 ```bash
-python python/main.py
+python python/Robotic_arm.py
 ```
 
-The application reads `config.json` by default.
-
-You can override settings using command-line arguments:
+The application reads `config.json` by default. You can override settings with command-line arguments:
 
 ```bash
-python python/main.py --ip 192.168.1.9 --port 5000
-```
-
-For other available options:
-
-```bash
-python python/main.py --help
+python python/Robotic_arm.py --ip 192.168.1.9 --port 5000
+python python/Robotic_arm.py --help
 ```
 
 The camera window displays the video feed and hand tracking information. Press `q` to exit.
@@ -139,19 +130,19 @@ The Python application sends newline-terminated TCP commands to the ESP32.
 | `Open_Palm` | Open the gripper |
 | `Closed_Fist` | Close the gripper |
 
-The ESP32 parses incoming commands and updates the target positions of the corresponding servos.
+The ESP32 parses incoming commands and updates the target positions of the corresponding servos. The firmware uses PCA9685 channels 0, 1, 2, 4, and 5 for the base, shoulder, elbow, wrist, and gripper respectively.
 
 Servo angles and physical movement ranges depend on the firmware configuration and mechanical assembly. Test the arm carefully before using the full movement range.
 
 ## Configuration
 
-See `config.example.json` for the available configuration fields.
+The `config.example.json` file contains these settings:
 
 - `esp32_ip`: IP address of the ESP32.
-- `port`: TCP server port.
+- `port`: TCP server port (default: `5000`).
 - `gesture_model`: path to the gesture recognition model.
 - `landmarker_model`: path to the hand landmark model.
-- `camera`: camera device index.
+- `camera`: camera device index (usually `0` for the default webcam).
 
 ## Troubleshooting
 
@@ -170,7 +161,7 @@ See `config.example.json` for the available configuration fields.
 
 ### MediaPipe model not found
 
-- Confirm both `.task` files exist.
+- Confirm both `.task` files exist in `models/`.
 - Check that the model paths in `config.json` are correct.
 
 ### Servos do not move correctly
@@ -186,4 +177,4 @@ Keep hands clear of moving joints during testing. Incorrect angle mappings, wiri
 
 ## License
 
-Add a license file if you intend to distribute this project publicly.
+See the `LICENSE` file for the project's license terms.
